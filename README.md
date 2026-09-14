@@ -72,6 +72,19 @@ The app includes four pages:
 - `Experimental Validation`: view the generated MAE/MSE results table.
 - `Theory`: read the typed convolution-theorem derivation.
 
+## Course Dashboard Compatibility
+
+Module 3 is fully runnable as a standalone submission using `streamlit run app.py`. It also
+exposes its pages through:
+
+```python
+from module3.webapp.pages import get_pages
+```
+
+A future course-level dashboard can import this provider and combine it with other modules in a
+shared module dropdown. That combined dashboard is optional convenience infrastructure; it is
+not required to run or grade this Module 3 repository.
+
 ## Reproduce the Experiment Results
 
 Generate the deterministic sample image:
