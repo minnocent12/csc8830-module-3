@@ -72,18 +72,92 @@ The app includes four pages:
 - `Experimental Validation`: view the generated MAE/MSE results table.
 - `Theory`: read the typed convolution-theorem derivation.
 
-## Course Dashboard Compatibility
+## Optional: Run Multiple Modules in One Dashboard
 
-Module 3 is fully runnable as a standalone submission using `streamlit run app.py`. It also
-exposes its pages through:
+This repository is independently runnable and gradable by itself. If multiple module
+repositories are available, they can also be placed beside each other and mounted in one
+Streamlit dashboard with a module dropdown.
+
+Create any parent workspace directory and clone the module repositories into it:
+
+```bash
+mkdir csc8830-workspace
+cd csc8830-workspace
+git clone https://github.com/minnocent12/csc8830-module-2.git
+git clone https://github.com/minnocent12/csc8830-module-3.git
+```
+
+The directory should look like this:
+
+```text
+csc8830-workspace/
+├── csc8830-module-2/
+└── csc8830-module-3/
+```
+
+Create a root dashboard file named `app.py` in `csc8830-workspace/`:
+
+```python
+from __future__ import annotations
+
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+import streamlit as st
+
+ROOT = Path(__file__).resolve().parent
+for src in ROOT.glob("csc8830-module-*/src"):
+    sys.path.insert(0, str(src))
+
+from module2.webapp.pages import get_pages as get_module2_pages
+from module3.webapp.pages import get_pages as get_module3_pages
+
+
+def main() -> None:
+    st.set_page_config(page_title="CSc 8830 Computer Vision", layout="wide")
+    pages = [*get_module2_pages(), *get_module3_pages()]
+
+    by_module = defaultdict(list)
+    for page in pages:
+        by_module[page.module_label].append(page)
+
+    with st.sidebar:
+        st.title("CSc 8830 Computer Vision")
+        module_label = st.selectbox("Module", list(by_module))
+        module_pages = sorted(by_module[module_label], key=lambda page: page.order)
+        page_label = st.radio("Page", [page.page_label for page in module_pages])
+
+    selected = next(page for page in module_pages if page.page_label == page_label)
+    selected.render()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Install the modules into one environment and run the dashboard from the parent workspace:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip
+python -m pip install -e csc8830-module-2
+python -m pip install -e csc8830-module-3
+streamlit run app.py
+```
+
+Module 3 supports this shared-dashboard workflow by exposing its pages through:
 
 ```python
 from module3.webapp.pages import get_pages
 ```
 
-A future course-level dashboard can import this provider and combine it with other modules in a
-shared module dropdown. That combined dashboard is optional convenience infrastructure; it is
-not required to run or grade this Module 3 repository.
+The standalone Module 3 command remains the recommended grading path for this repository:
+
+```bash
+streamlit run app.py
+```
 
 ## Reproduce the Experiment Results
 
