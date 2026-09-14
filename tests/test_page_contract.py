@@ -17,7 +17,7 @@ def _fake_module_provider() -> list[PageSpec]:
 def test_single_provider_returns_module3_pages_in_order() -> None:
     pages = collect_pages([get_pages])
     assert [p.page_label for p in pages] == [
-        "Filtering Demo",
+        "Image Blurring",
         "Spatial vs Fourier",
         "Experimental Validation",
         "Theory",
@@ -28,7 +28,7 @@ def test_single_provider_returns_module3_pages_in_order() -> None:
 def test_multiple_providers_merge_grouped_and_ordered() -> None:
     pages = collect_pages([get_pages, _fake_module_provider])
     assert [(p.module_label, p.page_label) for p in pages] == [
-        ("Module 3", "Filtering Demo"),
+        ("Module 3", "Image Blurring"),
         ("Module 3", "Spatial vs Fourier"),
         ("Module 3", "Experimental Validation"),
         ("Module 3", "Theory"),

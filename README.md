@@ -1,10 +1,49 @@
-# CSc 8830 Module 3 - Spatial vs Fourier Image Blurring
+# CSc 8830 Module 3 - Spatial and Fourier-Domain Image Blurring
 
-This repository implements the Module 3 computer vision assignment: spatial-domain blur
-filtering, equivalent Fourier-domain filtering, numerical validation, and a Streamlit web
-application that exposes all major components.
+This repository contains the Module 3 assignment for Georgia State University CSc 8830:
+Computer Vision. The project demonstrates image blurring in the spatial domain and verifies,
+mathematically and experimentally, that the equivalent Fourier-domain operation produces the
+same result when padding, kernel alignment, and boundary handling are matched correctly.
+
+The implementation is written in Python using OpenCV, NumPy, Matplotlib, pytest, and
+Streamlit.
+
+## What This Project Demonstrates
+
+- Spatial-domain image blurring with explicit average and Gaussian kernels.
+- Fourier-domain filtering with `fft2`, frequency-domain multiplication, and `ifft2`.
+- A typed convolution-theorem derivation in `docs/CONVOLUTION_THEOREM.md`.
+- Numerical validation using MAE, MSE, RMSE, maximum absolute error, and PSNR.
+- Difference-image visualization between spatial and Fourier results.
+- A standalone Streamlit web application exposing the required assignment components.
+- Reproducible sample data, result tables, figures, and tests.
+
+## Repository Structure
+
+```text
+.
+├── app.py                         # Streamlit entry point
+├── data/sample_images/            # Deterministic bundled sample image
+├── docs/                          # Theory, implementation notes, results discussion
+├── docs/report/figures/           # Generated comparison and kernel figures
+├── results/                       # Generated experiment CSV and Markdown table
+├── scripts/
+│   ├── generate_sample_image.py    # Creates the deterministic sample input
+│   └── run_experiments.py          # Recomputes validation metrics and figures
+├── src/module3/                   # Importable core package and web app pages
+└── tests/                         # Synthetic pytest coverage
+```
 
 ## Setup
+
+Clone the repository and enter the project directory:
+
+```bash
+git clone https://github.com/minnocent12/csc8830-module-3.git
+cd csc8830-module-3
+```
+
+Then create and activate a Python virtual environment:
 
 ```bash
 python -m venv .venv
@@ -13,7 +52,27 @@ python -m pip install -U pip
 python -m pip install -e ".[dev]"
 ```
 
-## Reproduce Results
+On Windows PowerShell, activate the environment with:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+## Run the Web Application
+
+```bash
+streamlit run app.py
+```
+
+The app includes four pages:
+
+- `Image Blurring`: upload/select an image, choose a blur filter, and preview the spatial
+  result.
+- `Spatial vs Fourier`: compare matched spatial and Fourier filtering on grayscale data.
+- `Experimental Validation`: view the generated MAE/MSE results table.
+- `Theory`: read the typed convolution-theorem derivation.
+
+## Reproduce the Experiment Results
 
 Generate the deterministic sample image:
 
@@ -21,36 +80,54 @@ Generate the deterministic sample image:
 python scripts/generate_sample_image.py
 ```
 
-Run the validation matrix and save result tables and figures:
+Run the full validation matrix:
 
 ```bash
 python scripts/run_experiments.py
 ```
 
-Run automated tests:
+This writes:
+
+- `data/sample_images/module3_sample.png`
+- `results/experiment_results.csv`
+- `results/experiment_results.md`
+- comparison and kernel figures in `docs/report/figures/`
+
+The generated table compares average and Gaussian filters across multiple kernel sizes. The
+measured errors are near machine precision because both implementations use the same grayscale
+`float64` input, normalized kernel, zero-padding strategy, and boundary model.
+
+## Run Tests
 
 ```bash
 python -m pytest -q
 ```
 
-## Run the Web App
+The tests cover kernel generation, image I/O, spatial filtering, Fourier alignment, comparison
+metrics, experiment generation, and the Streamlit page-registration contract.
 
-```bash
-streamlit run app.py
-```
+## Implementation Summary
 
-The app includes filtering controls, spatial/Fourier comparison, generated experiment results,
-and the typed convolution-theorem derivation.
+The canonical validation path operates on single-channel grayscale `float64` arrays. Spatial
+filtering uses `cv2.filter2D` with `cv2.BORDER_CONSTANT`. The Fourier path zero-pads the image
+by the kernel radius, embeds the kernel in the padded array, rolls the kernel center to the FFT
+origin, multiplies spectra, applies the inverse FFT, and crops back to the original image size.
 
-## Implementation Notes
+The display-only filtering demo applies the same kernel independently to each BGR channel with
+`BORDER_REFLECT_101`, which avoids visually distracting dark borders on uploaded photos. That
+preview path is intentionally separate from the numerical spatial-vs-Fourier validation.
 
-The numerical comparison pipeline uses grayscale `float64` images, explicit normalized kernels,
-matched zero boundary conditions, and a kernel-origin alignment step before FFT. The display
-demo applies the same kernel independently to each BGR channel with `BORDER_REFLECT_101` so
-uploaded photos look natural at the edges.
+## Documentation
 
-## Known Limitations
+- `docs/CONVOLUTION_THEOREM.md`: typed mathematical derivation.
+- `docs/IMPLEMENTATION_NOTES.md`: padding, alignment, boundary, precision, and color handling.
+- `docs/EXPERIMENTAL_RESULTS.md`: discussion of measured results.
+- `docs/architecture.md`: project organization and module boundaries.
 
-Generated experiment tables and figures are intentionally reproducible artifacts. If they are
-missing, run `scripts/generate_sample_image.py` and `scripts/run_experiments.py`. The final PDF,
-GitHub repository link, and demonstration video still need to be prepared for submission.
+## Current Validation Status
+
+- Implemented: core algorithms, experiment scripts, Streamlit app, tests, and documentation.
+- Tested: automated pytest suite passes.
+- Experimentally validated: results table generated by `scripts/run_experiments.py`.
+- Pending for final course submission: instructor access to the private GitHub repository,
+  demonstration video recording, final PDF assembly, and Google Classroom upload.

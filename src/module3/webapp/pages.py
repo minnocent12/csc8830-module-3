@@ -47,7 +47,7 @@ def _show_kernel(kernel_spec: KernelSpec) -> None:
 
 
 def _filtering_demo_page() -> None:
-    st.header("Filtering Demo")
+    st.header("Image Blurring")
     image, image_name = _load_user_or_sample_image("Image")
     if image is None:
         return
@@ -133,7 +133,7 @@ def _theory_page() -> None:
 def get_pages() -> list[PageSpec]:
     """Return the Module 3 pages contributed to a Streamlit host."""
     return [
-        PageSpec(_MODULE, "Filtering Demo", 10, _filtering_demo_page),
+        PageSpec(_MODULE, "Image Blurring", 10, _filtering_demo_page),
         PageSpec(_MODULE, "Spatial vs Fourier", 20, _comparison_page),
         PageSpec(_MODULE, "Experimental Validation", 30, _experimental_validation_page),
         PageSpec(_MODULE, "Theory", 40, _theory_page),
