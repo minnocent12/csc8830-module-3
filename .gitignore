@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.streamlit/
+.DS_Store
+
+# Keep the generated validation evidence for the submission.
+!docs/report/figures/*.png
+!results/*.csv
+!results/*.md
+
+# The bundled sample is deterministic and license-free; ignore accidental extra image dumps.
+data/sample_images/*
+!data/sample_images/.gitkeep
+!data/sample_images/module3_sample.png
