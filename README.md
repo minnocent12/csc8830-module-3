@@ -1,5 +1,7 @@
 # CSc 8830 Module 3 - Spatial and Fourier-Domain Image Blurring
 
+**Public web app (all modules):** <https://csc8830-dashboard-minnocent1.streamlit.app>
+
 This repository contains the Module 3 assignment for Georgia State University CSc 8830:
 Computer Vision. The project demonstrates image blurring in the spatial domain and verifies,
 mathematically and experimentally, that the equivalent Fourier-domain operation produces the
