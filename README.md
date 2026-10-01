@@ -81,7 +81,7 @@ The app includes four pages:
 Do not edit them by hand; they are refreshed from that repository with its
 `scripts/vendor.py`. The app needs nothing from csc8830-ui at runtime, and
 `tests/test_design_theme.py` checks that the config still matches the vendored kit.
-Requires `streamlit>=1.47,<2`.
+Requires `streamlit>=1.49,<2`.
 
 ## Optional: Run Multiple Modules in One Dashboard
 
