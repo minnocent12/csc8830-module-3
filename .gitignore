@@ -7,7 +7,9 @@ dist/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-.streamlit/
+.streamlit/*
+!.streamlit/config.toml
+.streamlit/secrets.toml
 .DS_Store
 
 # Keep the generated validation evidence for the submission.

@@ -74,6 +74,15 @@ The app includes four pages:
 - `Experimental Validation`: view the generated MAE/MSE results table.
 - `Theory`: read the typed convolution-theorem derivation.
 
+### Visual theme
+
+`src/module3/webapp/design/` and `.streamlit/config.toml` are generated copies of the shared
+[csc8830-ui](https://github.com/minnocent12/csc8830-ui) design kit (`KIT_VERSION` 0.2.0).
+Do not edit them by hand; they are refreshed from that repository with its
+`scripts/vendor.py`. The app needs nothing from csc8830-ui at runtime, and
+`tests/test_design_theme.py` checks that the config still matches the vendored kit.
+Requires `streamlit>=1.49,<2`.
+
 ## Optional: Run Multiple Modules in One Dashboard
 
 This repository is independently runnable and gradable by itself. If multiple module
