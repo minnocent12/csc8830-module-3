@@ -39,11 +39,11 @@ EXPECTED_LATEX = [
     (
         r"G[u, v] = \sum_m \sum_n h[m, n]\, \exp\!\left(-j\,2\pi"
         r" \left(\frac{um}{M} + \frac{vn}{N}\right)\right)"
-        r" \cdot \sum_a \sum_b f[a, b]\, \exp\!\left(-j\,2\pi"
+        r" \sum_a \sum_b f[a, b]\, \exp\!\left(-j\,2\pi"
         r" \left(\frac{ua}{M} + \frac{vb}{N}\right)\right)"
     ),
     r"G[u, v] = H[u, v]\, F[u, v]",
-    r"\text{DFT}\{f * h\} = \text{DFT}\{f\} \cdot \text{DFT}\{h\}",
+    r"\text{DFT}\{f * h\} = \text{DFT}\{f\}\, \text{DFT}\{h\}",
     r"f * h = \text{IDFT}\!\left(F[u, v]\, H[u, v]\right)",
 ]
 
@@ -106,10 +106,10 @@ def test_theory_page_implementation_section_content() -> None:
     assert "circular convolution" in all_text
 
 
-def test_theory_page_has_intro_caption() -> None:
+def test_theory_page_has_original_caption() -> None:
     app = _theory_app()
     captions = [c.value for c in app.caption]
-    assert any("digitized hand-worked" in c for c in captions)
+    assert any("Written derivation of the convolution theorem." in c for c in captions)
 
 
 def test_theory_page_sidebar_options_unchanged() -> None:

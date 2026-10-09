@@ -139,7 +139,7 @@ def _theory_page() -> None:
         st.error("The convolution theorem derivation is not available.")
         return
 
-    st.caption("This typed derivation is the digitized hand-worked theory artifact for Module 3.")
+    st.caption("Written derivation of the convolution theorem.")
 
     with theory_section("Variables"):
         st.markdown(
@@ -177,7 +177,7 @@ def _theory_page() -> None:
         equation_block(
             r"G[u, v] = \sum_m \sum_n h[m, n]\, \exp\!\left(-j\,2\pi"
             r" \left(\frac{um}{M} + \frac{vn}{N}\right)\right)"
-            r" \cdot \sum_a \sum_b f[a, b]\, \exp\!\left(-j\,2\pi"
+            r" \sum_a \sum_b f[a, b]\, \exp\!\left(-j\,2\pi"
             r" \left(\frac{ua}{M} + \frac{vb}{N}\right)\right)",
         )
         st.markdown(
@@ -186,7 +186,7 @@ def _theory_page() -> None:
         )
         equation_block(r"G[u, v] = H[u, v]\, F[u, v]")
         st.markdown("So:")
-        equation_block(r"\text{DFT}\{f * h\} = \text{DFT}\{f\} \cdot \text{DFT}\{h\}")
+        equation_block(r"\text{DFT}\{f * h\} = \text{DFT}\{f\}\, \text{DFT}\{h\}")
         st.markdown("and the equivalent filtering result can be recovered with the inverse transform:")
         equation_block(r"f * h = \text{IDFT}\!\left(F[u, v]\, H[u, v]\right)")
 
