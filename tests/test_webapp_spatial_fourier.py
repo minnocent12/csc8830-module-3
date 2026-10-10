@@ -294,3 +294,88 @@ def test_no_phase_terminology(at_default: AppTest) -> None:
     text = _all_visible_text(at_default)
     for term in ["Phase 13", "Phase 12", "migration", "AGENTS.md"]:
         assert term not in text, f"Internal term {term!r} in visible text"
+
+
+# ── 13. Upload state contract ─────────────────────────────────────────────────
+
+def _make_synthetic_png() -> bytes:
+    """Return a deterministic 64x96 BGR PNG as bytes (gradient+checkerboard)."""
+    import cv2, numpy as np
+    h, w = 64, 96
+    img = np.zeros((h, w, 3), dtype=np.uint8)
+    img[:, :, 0] = np.tile(np.linspace(30, 200, w, dtype=np.uint8), (h, 1))
+    img[:, :, 1] = np.tile(np.linspace(80, 180, h, dtype=np.uint8)[:, None], (1, w))
+    img[:, :, 2] = 120
+    for r in range(h):
+        for c in range(w):
+            if ((r // 8) + (c // 8)) % 2:
+                img[r, c] = np.clip(img[r, c].astype(int) + 40, 0, 255).astype(np.uint8)
+    _, enc = cv2.imencode('.png', img)
+    return enc.tobytes()
+
+
+_SYNTHETIC_PNG = _make_synthetic_png()
+_UPLOAD_TUPLE = ("test_synthetic.png", _SYNTHETIC_PNG, "image/png")
+
+# Pre/post upload metric contract at default settings (Average Blur 5x5)
+UPLOAD_BASELINE_METRICS = {
+    "MAE": "2.949e-14",
+    "MSE": "1.501e-27",
+    "RMSE": "3.875e-14",
+    "Max error": "1.705e-13",
+    "PSNR (dB)": "316.37",
+}
+
+
+@pytest.fixture(scope="module")
+def at_upload() -> AppTest:
+    """AppTest with Spatial vs Fourier page and synthetic image uploaded."""
+    if not hasattr(AppTest.from_file(APP, default_timeout=60).run(), "file_uploader"):
+        pytest.skip("file_uploader not tracked by this AppTest version")
+    at = AppTest.from_file(APP, default_timeout=60).run()
+    at.sidebar.radio[0].set_value("Spatial vs Fourier").run()
+    at.file_uploader[0].set_value(_UPLOAD_TUPLE).run()
+    return at
+
+
+def test_upload_no_exception(at_upload: AppTest) -> None:
+    assert not at_upload.exception
+
+
+def test_upload_four_images(at_upload: AppTest) -> None:
+    if not hasattr(at_upload, "image"):
+        pytest.skip("image not tracked by this AppTest version")
+    assert len(at_upload.image) == 4
+
+
+def test_upload_subheaders_unchanged(at_upload: AppTest) -> None:
+    sub_vals = [s.value for s in at_upload.subheader]
+    assert sub_vals == EXPECTED_SUBHEADERS, f"Got {sub_vals}"
+
+
+def test_upload_five_metrics(at_upload: AppTest) -> None:
+    assert len(at_upload.metric) == 5
+
+
+def test_upload_metric_labels_order(at_upload: AppTest) -> None:
+    labels = [m.label for m in at_upload.metric]
+    assert labels == ["MAE", "MSE", "RMSE", "Max error", "PSNR (dB)"], f"Got {labels}"
+
+
+def test_upload_metric_values_match_baseline(at_upload: AppTest) -> None:
+    """Uploaded-image metric values match pipeline-computed baseline (pre/post identical)."""
+    actual = {m.label: m.value for m in at_upload.metric}
+    for label, expected in UPLOAD_BASELINE_METRICS.items():
+        assert actual.get(label) == expected, (
+            f"{label}: expected {expected!r}, got {actual.get(label)!r}"
+        )
+
+
+def test_upload_methodology_caption(at_upload: AppTest) -> None:
+    captions = [c.value for c in at_upload.caption]
+    assert any("convolution theorem" in c for c in captions)
+
+
+def test_upload_imaginary_residual_caption(at_upload: AppTest) -> None:
+    captions = [c.value for c in at_upload.caption]
+    assert any("imaginary" in c for c in captions)
