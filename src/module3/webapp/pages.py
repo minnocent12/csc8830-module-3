@@ -16,7 +16,6 @@ from module3.visualization import contrast_stretch
 from module3.webapp._page import PageSpec
 from module3.webapp.design.components import (
     data_table,
-    download_action,
     equation_block,
     page_header as kit_page_header,
     section_header,
@@ -148,7 +147,7 @@ def _experimental_validation_page() -> None:
                     "Experiment": int(r["experiment"]),
                     "Filter": r["filter"],
                     "Kernel Size": f"{r['kernel_size']}x{r['kernel_size']}",
-                    "MAE": float(r["mae"]),
+                    "Spatial vs. Fourier MAE": float(r["mae"]),
                     "MSE": float(r["mse"]),
                     "RMSE": float(r["rmse"]),
                     "Max Abs Error": float(r["max_abs_error"]),
@@ -160,19 +159,13 @@ def _experimental_validation_page() -> None:
         data_table(
             rows,
             column_config={
-                "MAE": st.column_config.NumberColumn(format="%.6e"),
+                "Spatial vs. Fourier MAE": st.column_config.NumberColumn(format="%.6e"),
                 "MSE": st.column_config.NumberColumn(format="%.6e"),
                 "RMSE": st.column_config.NumberColumn(format="%.6e"),
                 "Max Abs Error": st.column_config.NumberColumn(format="%.6e"),
                 "PSNR (dB)": st.column_config.NumberColumn(format="%.2f"),
             },
             hide_index=True,
-        )
-        download_action(
-            "Download CSV",
-            data=csv_path.read_text(encoding="utf-8"),
-            file_name="experiment_results.csv",
-            mime="text/csv",
         )
     else:
         # CSV not available: fall back to the markdown table from the results document.

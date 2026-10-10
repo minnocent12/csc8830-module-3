@@ -1,14 +1,13 @@
 """Contract tests for the Module 3 Experimental Validation page.
 
 Covers:
-1. Default (results available): header, subheaders, dataframe, download button
+1. Default (results available): header, subheaders, dataframe
 2. Missing results: info message, no exception
 3. Dataframe contract: 6 rows, correct columns, exact CSV values
-4. Download button identity preserved
-5. Metric count unchanged (0)
-6. No exceptions in either state
-7. Status-message semantics (waiting state -> st.info, not st.warning)
-8. Public copy: no em/en dashes, no internal path in visible text
+4. Metric count unchanged (0)
+5. No exceptions in either state
+6. Status-message semantics (waiting state -> st.info, not st.warning)
+7. Public copy: no em/en dashes, no internal path in visible text
 """
 from __future__ import annotations
 
@@ -31,7 +30,7 @@ EXPECTED_ROW0 = {
     "Experiment": 1,
     "Filter": "Average Blur",
     "Kernel Size": "3x3",
-    "MAE": pytest.approx(7.02476813698e-14, rel=1e-6),
+    "Spatial vs. Fourier MAE": pytest.approx(7.02476813698e-14, rel=1e-6),
     "MSE": pytest.approx(7.63627040472e-27, rel=1e-6),
     "RMSE": pytest.approx(8.73857563034e-14, rel=1e-6),
     "Max Abs Error": pytest.approx(3.41060513165e-13, rel=1e-6),
@@ -41,7 +40,7 @@ EXPECTED_ROW0 = {
 
 EXPECTED_COLUMNS = [
     "Experiment", "Filter", "Kernel Size",
-    "MAE", "MSE", "RMSE", "Max Abs Error", "PSNR (dB)", "Observation",
+    "Spatial vs. Fourier MAE", "MSE", "RMSE", "Max Abs Error", "PSNR (dB)", "Observation",
 ]
 
 EXPECTED_FILTERS = ["Average Blur", "Average Blur", "Gaussian Blur",
@@ -121,7 +120,7 @@ def test_dataframe_row0_kernel_size(at_default: AppTest) -> None:
 @pytest.mark.skipif(not CSV_PATH.is_file(), reason="results CSV not committed")
 def test_dataframe_row0_mae(at_default: AppTest) -> None:
     df = at_default.dataframe[0].value
-    assert float(df.iloc[0]["MAE"]) == pytest.approx(7.02476813698e-14, rel=1e-6)
+    assert float(df.iloc[0]["Spatial vs. Fourier MAE"]) == pytest.approx(7.02476813698e-14, rel=1e-6)
 
 
 @pytest.mark.skipif(not CSV_PATH.is_file(), reason="results CSV not committed")
@@ -149,22 +148,13 @@ def test_dataframe_all_kernel_sizes(at_default: AppTest) -> None:
 
 
 @pytest.mark.skipif(not CSV_PATH.is_file(), reason="results CSV not committed")
-def test_dataframe_excludes_internal_max_imaginary_column(at_default: AppTest) -> None:
-    """max_imaginary_abs from the CSV is an internal diagnostic; it must not appear."""
+def test_dataframe_excludes_max_imaginary_column(at_default: AppTest) -> None:
+    """max_imaginary_abs was not in the pre-migration Markdown table; it must not appear here."""
     df = at_default.dataframe[0].value
     assert "max_imaginary_abs" not in df.columns
 
 
-# ── 4. Download button ────────────────────────────────────────────────────────
-
-def test_default_download_button_present(at_default: AppTest) -> None:
-    if not hasattr(at_default, "download_button"):
-        pytest.skip("download_button not tracked by this AppTest version")
-    labels = [b.label for b in at_default.download_button]
-    assert "Download CSV" in labels
-
-
-# ── 5. Missing results state ──────────────────────────────────────────────────
+# ── 4. Missing results state ──────────────────────────────────────────────────
 
 def test_missing_results_shows_info_not_warning() -> None:
     """When experiment_results.md is absent the page must use st.info, not st.warning."""
@@ -212,7 +202,7 @@ def test_missing_results_header_still_present() -> None:
             _pages._RESULTS_DIR = original
 
 
-# ── 6. Public copy ────────────────────────────────────────────────────────────
+# ── 5. Public copy ────────────────────────────────────────────────────────────
 
 def _all_visible_text(at: AppTest) -> str:
     parts = []
